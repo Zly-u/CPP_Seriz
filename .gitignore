@@ -1,0 +1,14 @@
+/.idea
+/.vs
+
+/__TEMP__
+/__BUILD__
+/__BUILD_CACHE__
+/__CMAKE_BUILD__
+/build
+/compile_commands.json
+
+*.dll
+*.lib
+*.pdb
+*.exp

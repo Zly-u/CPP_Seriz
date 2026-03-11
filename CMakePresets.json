@@ -1,0 +1,99 @@
+{
+	"version": 9,
+	"cmakeMinimumRequired": {
+		"major": 3,
+		"minor": 21
+	},
+	"configurePresets": [
+		{
+			"name": "default",
+			"hidden": true,
+			"displayName": "Default config",
+			"description": "Default config with VCPKG setup.",
+			"binaryDir": "${sourceDir}/__CMAKE_BUILD__/${presetName}",
+			"cacheVariables": {
+				"CMAKE_SYSTEM_NAME": "Windows",
+				"CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+			}
+		},
+
+		{
+			"name": "default-win",
+			"inherits": "default",
+			"hidden": true,
+			"displayName": "Default config (MSVC)",
+			"description": "Default config for MSVC compiler with VCPKG setup."
+		},
+
+		{
+			"name": "Debug-ms",
+			"inherits": "default-win",
+			"displayName": "Debug-ms",
+			"description": "Debug build.",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "Release-ms",
+			"inherits": "default-win",
+			"displayName": "Release-ms",
+			"description": "Release build.",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release"
+			}
+		},
+
+		{
+			"name": "CLion-Debug-ms",
+			"inherits": "default-win",
+			"displayName": "CLion-Debug-ms",
+			"description": "CLion compatible Debug build.",
+			"generator": "Ninja",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "CLion-Release-ms",
+			"inherits": "default-win",
+			"displayName": "CLion-Release-ms",
+			"description": "CLion compatible Release build.",
+			"generator": "Ninja",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release"
+			}
+		}
+	],
+
+
+
+
+	"buildPresets": [
+		{
+			"name": "CLion-Build-Release-ms",
+			"configurePreset": "CLion-Release-ms",
+			"configuration": "Release",
+			"nativeToolOptions": ["install"]
+		},
+		{
+			"name": "CLion-Build-Debug-ms",
+			"configurePreset": "CLion-Debug-ms",
+			"configuration": "Debug",
+			"nativeToolOptions": ["install"]
+		},
+
+		{
+			"name": "VS-Build-Release-ms",
+			"configurePreset": "Release-ms",
+			"configuration": "Release",
+			"targets": ["install"]
+		},
+		{
+			"name": "VS-Build-Debug-ms",
+			"configurePreset": "Debug-ms",
+			"configuration": "Debug",
+			"targets": ["install"]
+		}
+	]
+}
