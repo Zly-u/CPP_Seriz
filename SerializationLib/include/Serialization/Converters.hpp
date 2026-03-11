@@ -13,16 +13,12 @@ concept Serializable = requires(T obj, std::vector<std::byte>& buffer, std::ifst
 };
 
 
+// TODO: Split each type into their own specializations
 template <typename T>
 struct Convert {
 	using PrefixListSizeType = uint32_t;
-
 	static void decode(std::ifstream& file, T& OutData)
 	{
-		if (!file.is_open()) {
-			throw std::runtime_error("File stream is not open!");
-		}
-
 		if constexpr (std::is_arithmetic_v<T>)
 		{
 			file.read(reinterpret_cast<char*>(&OutData), sizeof(T));
@@ -56,7 +52,9 @@ struct Convert {
 				// TODO: For other types, and test it.
 				for (uint32_t i = 0; i < FetchedSize; ++i)
 				{
-					Convert<ElementType>::decode(file, OutData);
+					ElementType OutElementData;
+					Convert<ElementType>::decode(file, OutElementData);
+					OutData.push_back(OutElementData);
 				}
 			}
 		}
@@ -74,7 +72,8 @@ struct Convert {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-	static void encode(std::vector<std::byte>& buffer, const T& InData) {
+	static void encode(std::vector<std::byte>& buffer, const T& InData)
+	{
 		if constexpr (std::is_arithmetic_v<T>)
 		{
 			const auto* ptr = reinterpret_cast<const std::byte*>(&InData);
@@ -98,7 +97,7 @@ struct Convert {
 				}
 				else
 				{
-					for (const auto& element : InData)
+					for (const ElementType& element : InData)
 					{
 						Convert<ElementType>::encode(buffer, element);
 					}
@@ -106,7 +105,7 @@ struct Convert {
 			}
 			else if constexpr (std::ranges::range<T>) // for things that are spread around in the heap (e.g. std::list, std::unordered_map and etc)
 			{
-				for (const auto& element : InData)
+				for (const ElementType& element : InData)
 				{
 					Convert<ElementType>::encode(buffer, element);
 				}
