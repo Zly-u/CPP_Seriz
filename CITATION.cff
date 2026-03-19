@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Zly-u"
+  given-names: "Zly"
+title: "Seriz - Simple Serialization Library"
+version: 1.0.0
+date-released: 2026-03-20
+url: "https://github.com/Zly-u/CPP_Seriz"
