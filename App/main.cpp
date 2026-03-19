@@ -5,7 +5,8 @@
 #include "Serialization/Seriz.hpp"
 
 
-struct TestStruct {
+
+struct TestStruct1 {
 	uint8_t a;
 	uint16_t b;
 	uint32_t c;
@@ -29,6 +30,38 @@ struct TestStruct {
 };
 
 
+struct TestStruct2 {
+	uint8_t a;
+	uint16_t b;
+	uint32_t c;
+	uint64_t d;
+};
+
+
+template<>
+struct Convert<TestStruct2> {
+	static void encode(std::vector<std::byte>& buffer, const TestStruct2& InData)
+	{
+		std::print("Convert<TestStruct2>::encode() SPECIALIZATION \n");
+
+		// This encodes the whole thing at once, if that's desired.
+		const auto* ptr = reinterpret_cast<const std::byte*>(&InData);
+		buffer.insert(buffer.end(), ptr, ptr + sizeof(InData));
+	}
+
+
+	static void decode(std::ifstream& file, TestStruct2& OutData)
+	{
+		std::print("Convert<TestStruct2>::encode() SPECIALIZATION \n");
+
+		// This decodes the whole thing at once, if that's desired.
+		file.read(reinterpret_cast<char*>(&OutData), sizeof(OutData));
+	}
+};
+
+
+
+
 int main() {
 	try {
 		Seriz SerizWriter;
@@ -45,8 +78,10 @@ int main() {
 		SerizWriter.Write<std::list<uint32_t>>({1, 2, 3, 4});
 		SerizWriter.Write<std::list<std::string>>({"l1", "l2", "l3", "l4"});
 
-		TestStruct ts1{91, 92, 93, 94};
-		SerizWriter.Write<TestStruct>(ts1);
+		TestStruct1 ts1{81, 82, 83, 84};
+		TestStruct2 ts2{91, 92, 93, 94};
+		SerizWriter.Write(ts1);
+		SerizWriter.Write(ts2);
 
 		SerizWriter.Serialize("aaaa.bin");
 
@@ -72,7 +107,8 @@ int main() {
 		std::list<uint32_t> l1;
 		std::list<std::string> l2;
 
-		TestStruct ts1{91, 92, 93, 94};
+		TestStruct1 ts1{81, 82, 83, 84};
+		TestStruct2 ts2{91, 92, 93, 94};
 
 		SerizReader.Read<float>(a);
 		SerizReader.Read<uint32_t>(b);
@@ -86,7 +122,8 @@ int main() {
 		SerizReader.Read<std::list<uint32_t>>(l1);
 		SerizReader.Read<std::list<std::string>>(l2);
 
-		SerizReader.Read<TestStruct>(ts1);
+		SerizReader.Read(ts1);
+		SerizReader.Read(ts2);
 
 		std::println("Deserialization complete!");
 	}
