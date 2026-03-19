@@ -16,7 +16,7 @@ struct TestStruct1 {
 	uint32_t c;
 	uint64_t d;
 
-	void encode(Seriz* serializer) const {
+	void encode(zly::Seriz* serializer) const {
 		std::print("TestStruct::encode()\n");
 		serializer->Write<decltype(a)>(a);
 		serializer->Write<decltype(b)>(b);
@@ -24,7 +24,7 @@ struct TestStruct1 {
 		serializer->Write<decltype(d)>(d);
 	}
 
-	void decode(Seriz* deserializer) {
+	void decode(zly::Seriz* deserializer) {
 		std::print("TestStruct::decode()\n");
 		deserializer->Read<decltype(a)>(a);
 		deserializer->Read<decltype(b)>(b);
@@ -43,7 +43,7 @@ struct TestStruct2 {
 
 
 template<>
-struct Convert<TestStruct2> {
+struct zly::Convert<TestStruct2> {
 	static void encode(std::vector<std::byte>& buffer, const TestStruct2& InData)
 	{
 		std::print("Convert<TestStruct2>::encode() SPECIALIZATION \n");
@@ -68,7 +68,7 @@ struct Convert<TestStruct2> {
 
 int main() {
 	try {
-		Seriz SerizWriter;
+		zly::Seriz SerizWriter;
 
 		SerizWriter.Write<float>(10.f);
 		SerizWriter.Write<uint32_t>(69);
@@ -100,11 +100,11 @@ int main() {
 		SerizWriter.Write(unmap);
 
 		std::map<std::string, uint16_t> map{
-				{"m-test-1", 1},
-				{"m-test-2", 2},
-				{"m-test-3", 3},
-				{"m-test-4", 4},
-			};
+			{"m-test-1", 1},
+			{"m-test-2", 2},
+			{"m-test-3", 3},
+			{"m-test-4", 4},
+		};
 		SerizWriter.Write(map);
 
 		SerizWriter.Serialize("aaaa.bin");
@@ -118,7 +118,7 @@ int main() {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	try {
-		Seriz SerizReader;
+		zly::Seriz SerizReader;
 		SerizReader.LoadFile("aaaa.bin");
 
 		float a;
