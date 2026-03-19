@@ -6,10 +6,10 @@
 class Seriz;
 
 template<typename T>
-concept CSerializable = requires(T* obj, Seriz* serializer, std::vector<std::byte>& buffer, std::ifstream& file)
+concept CSerializable = requires(T* obj, Seriz* serializer)
 {
-	{ obj->encode(serializer, buffer) } -> std::same_as<void>;
-	{ obj->decode(serializer, file)   } -> std::same_as<void>;
+	{ obj->encode(serializer) } -> std::same_as<void>;
+	{ obj->decode(serializer) } -> std::same_as<void>;
 };
 
 

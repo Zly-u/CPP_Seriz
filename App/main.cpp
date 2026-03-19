@@ -15,7 +15,7 @@ struct TestStruct1 {
 	uint32_t c;
 	uint64_t d;
 
-	void encode(Seriz* serializer, std::vector<std::byte>& buffer) const {
+	void encode(Seriz* serializer) const {
 		std::print("TestStruct::encode()\n");
 		serializer->Write<decltype(a)>(a);
 		serializer->Write<decltype(b)>(b);
@@ -23,7 +23,7 @@ struct TestStruct1 {
 		serializer->Write<decltype(d)>(d);
 	}
 
-	void decode(Seriz* deserializer, std::ifstream& file) {
+	void decode(Seriz* deserializer) {
 		std::print("TestStruct::decode()\n");
 		deserializer->Read<decltype(a)>(a);
 		deserializer->Read<decltype(b)>(b);
@@ -71,7 +71,10 @@ int main() {
 
 		SerizWriter.Write<float>(10.f);
 		SerizWriter.Write<uint32_t>(69);
-		SerizWriter.Write<std::string>("sex");
+		SerizWriter.Write<std::string>("say gex");
+
+		std::string_view d = "test";
+		SerizWriter.Write(d);
 
 		SerizWriter.Write<std::vector<uint8_t>>({1, 2, 3, 4, 5, 6});
 		SerizWriter.Write<std::vector<uint16_t>>({11, 22, 33, 44, 55, 66});
@@ -94,6 +97,14 @@ int main() {
 		};
 		SerizWriter.Write(unmap);
 
+		std::map<std::string, uint16_t> map{
+				{"m-test-1", 1},
+				{"m-test-2", 2},
+				{"m-test-3", 3},
+				{"m-test-4", 4},
+			};
+		SerizWriter.Write(map);
+
 		SerizWriter.Serialize("aaaa.bin");
 
 		std::println("Serialization complete!");
@@ -109,6 +120,7 @@ int main() {
 		float a;
 		uint32_t b;
 		std::string c;
+		std::string d;
 
 		std::vector<uint8_t> d1;
 		std::vector<uint16_t> d2;
@@ -122,10 +134,12 @@ int main() {
 		TestStruct2 ts2{91, 92, 93, 94};
 
 		std::unordered_map<std::string, uint8_t> unmap;
+		std::map<std::string, uint16_t> map;
 
 		SerizReader.Read<float>(a);
 		SerizReader.Read<uint32_t>(b);
 		SerizReader.Read<std::string>(c);
+		SerizReader.Read<std::string>(d);
 
 		SerizReader.Read<std::vector<uint8_t>>(d1);
 		SerizReader.Read<std::vector<uint16_t>>(d2);
@@ -138,7 +152,8 @@ int main() {
 		SerizReader.Read(ts1);
 		SerizReader.Read(ts2);
 
-		SerizReader.Read<std::unordered_map<std::string, uint8_t>>(unmap);
+		SerizReader.Read(unmap);
+		SerizReader.Read(map);
 
 		std::println("Deserialization complete!");
 	}

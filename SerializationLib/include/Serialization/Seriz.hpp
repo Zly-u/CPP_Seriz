@@ -20,7 +20,7 @@ class SERIZ_API Seriz {
 		{
 			if constexpr (CSerializable<T>)
 			{
-				InVal.encode(this, buffer);
+				InVal.encode(this);
 			}
 			else
 			{
@@ -40,7 +40,7 @@ class SERIZ_API Seriz {
 		{
 			if constexpr (CSerializable<T>)
 			{
-				OutVal.decode(this, loaded_file);
+				OutVal.decode(this);
 			}
 			else
 			{
@@ -48,8 +48,7 @@ class SERIZ_API Seriz {
 			}
 		}
 
-
-
+	
 	private:
 		std::vector<std::byte> buffer;
 		std::ifstream loaded_file;
