@@ -1,7 +1,10 @@
 #include <filesystem>
 #include <iostream>
 #include <list>
+#include <map>
 #include <print>
+#include <unordered_map>
+
 #include "Serialization/Seriz.hpp"
 
 
@@ -83,6 +86,14 @@ int main() {
 		SerizWriter.Write(ts1);
 		SerizWriter.Write(ts2);
 
+		std::unordered_map<std::string, uint8_t> unmap{
+			{"um-test-1", 1},
+			{"um-test-2", 2},
+			{"um-test-3", 3},
+			{"um-test-4", 4},
+		};
+		SerizWriter.Write(unmap);
+
 		SerizWriter.Serialize("aaaa.bin");
 
 		std::println("Serialization complete!");
@@ -110,6 +121,8 @@ int main() {
 		TestStruct1 ts1{81, 82, 83, 84};
 		TestStruct2 ts2{91, 92, 93, 94};
 
+		std::unordered_map<std::string, uint8_t> unmap;
+
 		SerizReader.Read<float>(a);
 		SerizReader.Read<uint32_t>(b);
 		SerizReader.Read<std::string>(c);
@@ -124,6 +137,8 @@ int main() {
 
 		SerizReader.Read(ts1);
 		SerizReader.Read(ts2);
+
+		SerizReader.Read<std::unordered_map<std::string, uint8_t>>(unmap);
 
 		std::println("Deserialization complete!");
 	}

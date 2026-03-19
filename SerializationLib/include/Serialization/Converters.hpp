@@ -40,6 +40,26 @@ struct Convert<T> {
 };
 
 
+// This also assists a serialization for std::pair based containers.
+template <typename K, typename V>
+struct Convert<std::pair<K, V>> {
+	using Type = std::pair<K, V>;
+	using KeyType = std::remove_const_t<K>;
+
+	static void decode(std::ifstream& file, Type& OutData)
+	{
+		Convert<KeyType>::decode(file, const_cast<KeyType&>(OutData.first));
+		Convert<V>::decode(file, OutData.second);
+	}
+
+	static void encode(std::vector<std::byte>& buffer, const Type& InData)
+	{
+		Convert<K>::encode(buffer, InData.first);
+		Convert<V>::encode(buffer, InData.second);
+	}
+};
+
+
 // For std::array, std::vector, std::string, std::view_string and such.
 template <typename T>
 requires std::ranges::range<T> && std::ranges::contiguous_range<T>
@@ -110,11 +130,16 @@ struct Convert<T>
 		PrefixListSizeType FetchedSize;
 		file.read(reinterpret_cast<char*>(&FetchedSize), sizeof(PrefixListSizeType));
 
+		auto It = std::inserter(OutData, OutData.end());
+
+		using NonConstElementType = std::remove_const_t<ElementType>;
+
 		for (uint32_t i = 0; i < FetchedSize; ++i)
 		{
-			ElementType OutElementData;
-			Convert<ElementType>::decode(file, OutElementData);
-			OutData.push_back(OutElementData);
+			NonConstElementType OutElementData;
+			Convert<NonConstElementType>::decode(file, OutElementData);
+
+			*It = std::move(OutElementData);
 		}
 	}
 
