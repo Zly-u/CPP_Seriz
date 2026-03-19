@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <vector>
+#include <cassert>
 
 class Seriz;
 
@@ -12,6 +13,11 @@ concept CSerializable = requires(T* obj, Seriz* serializer)
 	{ obj->decode(serializer) } -> std::same_as<void>;
 };
 
+template<typename T>
+concept CResizable = requires(T& container, typename T::size_type size)
+{
+	{ container.resize(size) } -> std::same_as<void>;
+};
 
 
 template <typename T>
@@ -75,14 +81,23 @@ struct Convert<T>
 		PrefixListSizeType FetchedSize;
 		file.read(reinterpret_cast<char*>(&FetchedSize), sizeof(PrefixListSizeType));
 
-		if constexpr (requires { OutData.resize(FetchedSize); }) {
+
+		if constexpr (CResizable<T>)
+		{
 			OutData.resize(FetchedSize);
 		}
+		else
+		{
+			// Not sure if this is a good idea, but it was the only way
+			// I could figure a size of the container via its type.
+			// Tested with std::array, and from it i got this ::iterator::_EEN_SIZE solution.
+			static_assert(T::iterator::_EEN_SIZE == OutData.size(), "Not the same static container size!");
+		}
+
 
 		if constexpr(std::is_arithmetic_v<ElementType>)
 		{
 			const size_t ElementSize = sizeof(ElementType);
-			OutData.resize(FetchedSize);
 			file.read(reinterpret_cast<char*>(OutData.data()), FetchedSize * ElementSize);
 		}
 		else

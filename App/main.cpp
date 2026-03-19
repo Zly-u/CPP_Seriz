@@ -1,3 +1,4 @@
+#include <array>
 #include <filesystem>
 #include <iostream>
 #include <list>
@@ -125,7 +126,7 @@ int main() {
 		std::string c;
 		std::string d;
 
-		std::vector<uint8_t> d1;
+		std::array<uint8_t, 6> d1;
 		std::vector<uint16_t> d2;
 		std::vector<uint32_t> d3;
 		std::vector<uint64_t> d4;
@@ -145,7 +146,7 @@ int main() {
 		SerizReader.Read<std::string>(c);
 		SerizReader.Read<std::string>(d);
 
-		SerizReader.Read<std::vector<uint8_t>>(d1);
+		SerizReader.Read<std::array<uint8_t, 6>>(d1);
 		SerizReader.Read<std::vector<uint16_t>>(d2);
 		SerizReader.Read<std::vector<uint32_t>>(d3);
 		SerizReader.Read<std::vector<uint64_t>>(d4);
