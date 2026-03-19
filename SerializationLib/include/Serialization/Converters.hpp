@@ -75,6 +75,10 @@ struct Convert<T>
 		PrefixListSizeType FetchedSize;
 		file.read(reinterpret_cast<char*>(&FetchedSize), sizeof(PrefixListSizeType));
 
+		if constexpr (requires { OutData.resize(FetchedSize); }) {
+			OutData.resize(FetchedSize);
+		}
+
 		if constexpr(std::is_arithmetic_v<ElementType>)
 		{
 			const size_t ElementSize = sizeof(ElementType);
@@ -83,9 +87,9 @@ struct Convert<T>
 		}
 		else
 		{
-			for (uint32_t i = 0; i < FetchedSize; ++i)
+			for (ElementType& element : OutData)
 			{
-				Convert<ElementType>::decode(file, OutData);
+				Convert<ElementType>::decode(file, element);
 			}
 		}
 	}

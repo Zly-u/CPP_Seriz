@@ -48,7 +48,7 @@ class SERIZ_API Seriz {
 			}
 		}
 
-	
+
 	private:
 		std::vector<std::byte> buffer;
 		std::ifstream loaded_file;
