@@ -5,6 +5,29 @@
 #include "Serialization/Seriz.hpp"
 
 
+struct TestStruct {
+	uint8_t a;
+	uint16_t b;
+	uint32_t c;
+	uint64_t d;
+
+	void encode(Seriz* serializer, std::vector<std::byte>& buffer) const {
+		std::print("TestStruct::encode()\n");
+		serializer->Write<decltype(a)>(a);
+		serializer->Write<decltype(b)>(b);
+		serializer->Write<decltype(c)>(c);
+		serializer->Write<decltype(d)>(d);
+	}
+
+	void decode(Seriz* deserializer, std::ifstream& file) {
+		std::print("TestStruct::decode()\n");
+		deserializer->Read<decltype(a)>(a);
+		deserializer->Read<decltype(b)>(b);
+		deserializer->Read<decltype(c)>(c);
+		deserializer->Read<decltype(d)>(d);
+	}
+};
+
 
 int main() {
 	try {
@@ -21,6 +44,9 @@ int main() {
 
 		SerizWriter.Write<std::list<uint32_t>>({1, 2, 3, 4});
 		SerizWriter.Write<std::list<std::string>>({"l1", "l2", "l3", "l4"});
+
+		TestStruct ts1{91, 92, 93, 94};
+		SerizWriter.Write<TestStruct>(ts1);
 
 		SerizWriter.Serialize("aaaa.bin");
 
@@ -46,6 +72,8 @@ int main() {
 		std::list<uint32_t> l1;
 		std::list<std::string> l2;
 
+		TestStruct ts1{91, 92, 93, 94};
+
 		SerizReader.Read<float>(a);
 		SerizReader.Read<uint32_t>(b);
 		SerizReader.Read<std::string>(c);
@@ -57,6 +85,8 @@ int main() {
 
 		SerizReader.Read<std::list<uint32_t>>(l1);
 		SerizReader.Read<std::list<std::string>>(l2);
+
+		SerizReader.Read<TestStruct>(ts1);
 
 		std::println("Deserialization complete!");
 	}

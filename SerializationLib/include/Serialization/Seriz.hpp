@@ -16,19 +16,36 @@ class SERIZ_API Seriz {
 		void LoadFile(std::filesystem::path&& filePath);
 
 		template <typename T>
-		void Write(T& InVal) {
-			Convert<T>::encode(buffer, InVal);
+		void Write(const T& InVal)
+		{
+			if constexpr (CSerializable<T>)
+			{
+				InVal.encode(this, buffer);
+			}
+			else
+			{
+				Convert<T>::encode(buffer, InVal);
+			}
 		}
 
 		template <typename T>
-		void Write(T&& InVal) {
+		void Write(const T&& InVal)
+		{
 			Convert<T>::encode(buffer, InVal);
 		}
 
 
 		template<typename T>
-		void Read(T& OutVal) {
-			Convert<T>::decode(loaded_file, OutVal);
+		void Read(T& OutVal)
+		{
+			if constexpr (CSerializable<T>)
+			{
+				OutVal.decode(this, loaded_file);
+			}
+			else
+			{
+				Convert<T>::decode(loaded_file, OutVal);
+			}
 		}
 
 

@@ -5,18 +5,22 @@
 #include <print>
 
 
+class Seriz;
+
 template<typename T>
-concept Serializable = requires(T obj, std::vector<std::byte>& buffer, std::ifstream& file, T& Data)
+concept CSerializable = requires(T* obj, Seriz* serializer, std::vector<std::byte>& buffer, std::ifstream& file)
 {
-	{ obj.encode(buffer, Data) } -> std::same_as<void>;
-	{ obj.decode(file, Data)   } -> std::same_as<void>;
+	{ obj->encode(serializer, buffer) } -> std::same_as<void>;
+	{ obj->decode(serializer, file)   } -> std::same_as<void>;
 };
 
 
 // TODO: Split each type into their own specializations
 template <typename T>
-struct Convert {
+struct Convert
+{
 	using PrefixListSizeType = uint32_t;
+
 	static void decode(std::ifstream& file, T& OutData)
 	{
 		if constexpr (std::is_arithmetic_v<T>)
@@ -58,7 +62,7 @@ struct Convert {
 				}
 			}
 		}
-		else if constexpr (Serializable<T>)
+		else if constexpr (CSerializable<T>)
 		{
 			OutData.decode(file, OutData);
 		}
@@ -111,13 +115,13 @@ struct Convert {
 				}
 			}
 		}
-		else if constexpr (Serializable<T>) // For custom types that implement serializing methods.
+		else if constexpr (CSerializable<T>) // For custom types that implement serializing methods.
 		{
-			InData.encode(buffer, InData);
+			InData.encode(buffer);
 		}
 		else
 		{
-			static_assert(false, "No encoding is implemented for this type!");
+			static_assert(false, "No serialization methods are implemented for this type!");
 		}
 	}
 };
